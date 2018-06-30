@@ -1,8 +1,9 @@
 **Spring Boot and RHOAR - Leave Vacation Sample App**
 
-A Leave Vacation from employees sample app developed with Spring Boot and Openshift RHOAR.
+A sample app to manage leave vacation requests for employees, developed with Spring Boot and Openshift RHOAR.
 
 It exposes some REST services and persists data on a postgres database.
+
 
 **Test the application locally from a web browser**
 
@@ -10,18 +11,20 @@ It exposes some REST services and persists data on a postgres database.
 mvn spring-boot:run
 ```
 
-These eendpoints are available:
+These endpoints are available:
  - list employees with leave list
 
  ```
  [GET] http://localhost:8080/api/employees?page=<page_number>&pageSize=<page_size>
  ```
 
+
 **Execute the test locally**
 
 ```bash
 mvn verify
 ```
+
 
 **Create project and app on OpenShift**
 
@@ -32,6 +35,7 @@ oc new-project leave_vacation --display-name="Leave Vacation App"
 
 oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
 ```
+
 
 **OpenShift resources**
 
@@ -50,6 +54,7 @@ OCP resources inside the folder src/main/fabric8 will be created in OCP project 
 ```bash
 mvn package fabric8:deploy -Popenshift -DskipTests
 ```
+
 
 **Health check**
 
