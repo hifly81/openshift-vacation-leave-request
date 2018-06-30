@@ -1,8 +1,9 @@
 package com.redhat.springboot.vacationleave.employee.service;
 
 import com.redhat.springboot.vacationleave.employee.dto.EmployeeDto;
+import com.redhat.springboot.vacationleave.employee.dto.SickRequestDto;
 
 public interface SickRequestService {
 
-    void sendRequest(EmployeeDto employeeDto);
+    SickRequestDto sendRequest(EmployeeDto employeeDto);
 }

@@ -1,8 +1,10 @@
 package com.redhat.springboot.vacationleave.employee.controller;
 
 import com.redhat.springboot.vacationleave.employee.dto.EmployeeDto;
+import com.redhat.springboot.vacationleave.employee.dto.SickRequestDto;
 import com.redhat.springboot.vacationleave.employee.model.Employee;
 import com.redhat.springboot.vacationleave.employee.service.EmployeeService;
+import com.redhat.springboot.vacationleave.employee.service.SickRequestService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +24,9 @@ public class EmployeeController {
 
     @Autowired
     EmployeeService employeeService;
+
+    @Autowired
+    SickRequestService sickRequestService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -41,6 +43,14 @@ public class EmployeeController {
         }
         else
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseBody
+    @PostMapping(value = "/sickRequest", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SickRequestDto> sendSickRequest(@RequestBody EmployeeDto input) {
+        SickRequestDto sickRequestDto = sickRequestService.sendRequest(input);
+        return new ResponseEntity<>(sickRequestDto, HttpStatus.OK);
+
     }
 
     private EmployeeDto convertToDto(Employee employee) {

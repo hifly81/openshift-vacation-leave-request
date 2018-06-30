@@ -26,6 +26,18 @@ These endpoints are available for employee microservice (listen on port 8080):
  [GET] http://localhost:8080/api/employees?page=<page_number>&pageSize=<page_size>
  ```
 
+  - send sick request form employee
+
+  ```
+  [POST] http://localhost:8080/api/employees/sickRequest
+
+   body example:
+
+    {
+    	"id": "1",
+    }
+  ```
+
 These endpoints are available for sick requests microservice (listen on port 8090):
 
   - send sick request
