@@ -19,12 +19,28 @@ Execute the maven command for each microservices (go to the specific microservic
 mvn spring-boot:run
 ```
 
-These endpoints are available for employee microservice:
+These endpoints are available for employee microservice (listen on port 8080):
  - list employees with leave list
 
  ```
  [GET] http://localhost:8080/api/employees?page=<page_number>&pageSize=<page_size>
  ```
+
+These endpoints are available for sick requests microservice (listen on port 8090):
+
+  - send sick request
+
+  ```
+  [PUT] http://localhost:8090/api/sickrequests
+
+  body example:
+
+  {
+  	"employeeId": "1",
+  	"dateRequested": "2018-10-21"
+  }
+
+  ```
 
 
 **Execute the test locally**
@@ -47,6 +63,10 @@ oc new-project leave_vacation --display-name="Leave Vacation App"
 #Create database for employee service
 
 oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
+
+#Create database for sick requests service
+
+oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database-sickrequests
 ```
 
 

@@ -25,6 +25,7 @@
 
     <modules>
         <module>employee-microservice</module>
+        <module>sickrequests-microservice</module>
     </modules>
 
     <dependencyManagement>
