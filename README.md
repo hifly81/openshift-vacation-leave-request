@@ -103,3 +103,17 @@ Just add it to your pom.xml
    <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
 ```
+
+On local web browser are available at:
+
+ ```
+ #for employee microservice
+
+ [GET] http://localhost:8080/health
+ ```
+
+  ```
+  #for sick requests microservice
+
+  [GET] http://localhost:8090/health
+  ```
