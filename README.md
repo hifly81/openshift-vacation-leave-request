@@ -2,16 +2,24 @@
 
 A sample app to manage leave vacation requests for employees, developed with Spring Boot and Openshift RHOAR.
 
-It exposes some REST services and persists data on a postgres database.
+The app is composed by 2 microservices:
+ - employee service
+ - sick requests service
+
+The employee service communicates with sick requests service in order to send specific employee's leave requests
+
+Both microservices use a dedicated postgres database to persist their data.
 
 
 **Test the application locally from a web browser**
+
+Execute the maven command for each microservices (go to the specific microservice root folder):
 
 ```bash
 mvn spring-boot:run
 ```
 
-These endpoints are available:
+These endpoints are available for employee microservice:
  - list employees with leave list
 
  ```
@@ -21,17 +29,22 @@ These endpoints are available:
 
 **Execute the test locally**
 
+Execute the maven command for each microservices (go to the specific microservice root folder):
+
 ```bash
 mvn verify
 ```
 
 
-**Create project and app on OpenShift**
+**Create project and apps on OpenShift**
 
 ```bash
 oc login -u developer -p developer
 
+#Create OCP project
 oc new-project leave_vacation --display-name="Leave Vacation App"
+
+#Create database for employee service
 
 oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
 ```
@@ -51,6 +64,8 @@ Deploy on OCP will use the fabric8 maven plugin and maven profile openshift.
 
 OCP resources inside the folder src/main/fabric8 will be created in OCP project leave_vacation.
 
+Execute the maven command for each microservices (go to the specific microservice root folder):
+
 ```bash
 mvn package fabric8:deploy -Popenshift -DskipTests
 ```
@@ -68,4 +83,3 @@ Just add it to your pom.xml
    <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
 ```
-
