@@ -1,4 +1,4 @@
-package com.redhat.springboot.vacationleave.sickrequests;
+package com.redhat.springboot.vacationleave.sickrequests.service;
 
 import com.redhat.springboot.vacationleave.sickrequests.dto.SickRequestDto;
 import com.redhat.springboot.vacationleave.sickrequests.model.SickRequestStatus;
@@ -28,7 +28,7 @@ public class SickServiceTest {
     @Test
     public void save() {
         SickRequestDto sickRequestDto = new SickRequestDto();
-        sickRequestDto.setEmployeeId(1);
+        sickRequestDto.setEmployeeId("AB121231");
         sickRequestDto.setDateRequested(LocalDate.of(2018, 10, 21));
         sickRequestDto = sickService.save(sickRequestDto);
         assertNotNull(sickRequestDto);

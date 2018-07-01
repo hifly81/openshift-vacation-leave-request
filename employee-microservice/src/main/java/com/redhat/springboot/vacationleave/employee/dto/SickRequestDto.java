@@ -8,7 +8,7 @@ public class SickRequestDto {
 
     private Integer id;
 
-    private Integer employeeId;
+    private String employeeId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateRequested;
@@ -24,11 +24,11 @@ public class SickRequestDto {
         this.id = id;
     }
 
-    public Integer getEmployeeId() {
+    public String getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(Integer employeeId) {
+    public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }
 

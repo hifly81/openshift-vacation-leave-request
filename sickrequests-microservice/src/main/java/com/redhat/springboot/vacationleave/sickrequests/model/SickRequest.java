@@ -12,7 +12,7 @@ public class SickRequest {
     private Integer id;
 
     @Column(name = "employeeid")
-    private Integer employeeId;
+    private String employeeId;
 
     @Column(name = "daterequested")
     private LocalDate dateRequested;
@@ -30,11 +30,11 @@ public class SickRequest {
         this.id = id;
     }
 
-    public Integer getEmployeeId() {
+    public String getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(Integer employeeId) {
+    public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }
 

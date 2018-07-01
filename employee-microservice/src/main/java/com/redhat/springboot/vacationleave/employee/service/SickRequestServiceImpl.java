@@ -21,10 +21,9 @@ public class SickRequestServiceImpl implements SickRequestService {
     public SickRequestDto sendRequest(EmployeeDto employeeDto) {
         RestTemplate restTemplate = new RestTemplate();
         SickRequestDto sickRequestDto = new SickRequestDto();
-        sickRequestDto.setEmployeeId(employeeDto.getId());
+        sickRequestDto.setEmployeeId(employeeDto.getSsn());
         sickRequestDto.setDateRequested(LocalDate.now());
         HttpEntity<SickRequestDto> entity = new HttpEntity<>(sickRequestDto);
-        System.out.println("ENTRITTTTT:::::" + entity.getBody().getDateRequested());
         ResponseEntity<SickRequestDto> responseEntity =
                 restTemplate.exchange(sickRequestsServiceUrl, HttpMethod.PUT, entity, SickRequestDto.class);
         return responseEntity.getBody();

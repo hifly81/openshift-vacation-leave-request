@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-    @RequestMapping(value = "/api/sickrequests")
+@RequestMapping(value = "/api/sickrequests")
 public class SickRequestsController {
 
     @Autowired

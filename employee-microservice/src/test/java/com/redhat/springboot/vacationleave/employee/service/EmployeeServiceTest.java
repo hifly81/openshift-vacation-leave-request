@@ -1,4 +1,4 @@
-package com.redhat.springboot.vacationleave.employee;
+package com.redhat.springboot.vacationleave.employee.service;
 
 import com.redhat.springboot.vacationleave.employee.model.Employee;
 import com.redhat.springboot.vacationleave.employee.service.EmployeeService;
@@ -36,9 +36,6 @@ public class EmployeeServiceTest {
         Page<Employee> page = employeeService.list(pageRequest);
         assertNotNull(page);
         page.getContent().forEach(e -> assertNotNull(e.getLeaves()));
-        for(Employee e: page.getContent()) {
-            System.out.println(e);
-        }
     }
 
 
