@@ -70,7 +70,7 @@ mvn verify
 oc login -u developer -p developer
 
 #Create OCP project
-oc new-project leave_vacation --display-name="Leave Vacation App"
+oc new-project leave-vacation --display-name="Leave Vacation App"
 
 #Create database for employee service
 
@@ -102,6 +102,20 @@ Execute the maven command for each microservices (go to the specific microservic
 mvn package fabric8:deploy -Popenshift -DskipTests
 ```
 
+Endpoints will be available via OCP routes:
+
+```
+#for employee microservice
+
+http://rhoar-employee-microservice-leave-vacation.ocp-cluster_ip
+```
+
+```
+#for sick requests microservice
+
+http://rhoar-sickrequests-microservice-leave-vacation.ocp-cluster_ip
+```
+
 
 **Health check**
 
@@ -129,3 +143,17 @@ On local web browser are available at:
 
   [GET] http://localhost:8090/health
   ```
+
+  On OpenShift are available at:
+
+   ```
+   #for employee microservice
+
+   [GET] http://rhoar-employee-microservice-leave-vacation.ocp-cluster_ip/health
+   ```
+
+    ```
+    #for sick requests microservice
+
+    [GET] http://rhoar-sickrequests-microservice-leave-vacation.ocp-cluster_ip/health
+    ```
