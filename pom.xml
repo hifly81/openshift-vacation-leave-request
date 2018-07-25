@@ -25,6 +25,10 @@
         <spring-boot.bom.version>1.5.12.Final-redhat-1</spring-boot.bom.version>
         <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
         <fabric8-maven-plugin.version>3.5.38</fabric8-maven-plugin.version>
+        <!--opentracing and jaeger> -->
+        <opentracing-version>0.0.9</opentracing-version>
+        <opentracing-api-version>0.30.0</opentracing-api-version>
+        <jaeger-version>0.20.0</jaeger-version>
     </properties>
 
 
@@ -56,6 +60,26 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${fasterxml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing.contrib</groupId>
+                <artifactId>opentracing-spring-web</artifactId>
+                <version>${opentracing-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing.contrib</groupId>
+                <artifactId>opentracing-web-servlet-filter</artifactId>
+                <version>${opentracing-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-api</artifactId>
+                <version>${opentracing-api-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.uber.jaeger</groupId>
+                <artifactId>jaeger-core</artifactId>
+                <version>${jaeger-version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>

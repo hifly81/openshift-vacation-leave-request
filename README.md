@@ -66,6 +66,12 @@ mvn verify
 
 **Create project and apps on OpenShift**
 
+Info to run a local OpenShift cluster:<br>
+https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md
+
+Info to install and run Minishift:<br>
+https://github.com/minishift/minishift
+
 ```bash
 oc login -u developer -p developer
 
@@ -84,7 +90,7 @@ oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_D
 
 **OpenShift resources**
 
-OCP resources are inside the folder src/main/fabric8:
+OpenShift resources are inside the folder src/main/fabric8 and they will created during the deployment:
  - credentials-secret.yml --> create a secret to be used for postgres username and password
  - deployment.yml --> define the deployment configuration
  - route.yml --> create a route for external communication
@@ -92,9 +98,11 @@ OCP resources are inside the folder src/main/fabric8:
 
 **Deploy on OpenShift**
 
-Deploy on OCP will use the fabric8 maven plugin and maven profile openshift.
+Deploy on OpenShift will use the fabric8 maven plugin and maven profile openshift.
 
-OCP resources inside the folder src/main/fabric8 will be created in OCP project leave_vacation.
+OpenShift resources inside the folder src/main/fabric8 will be created in OpenShift project leave_vacation.
+
+Application specific properties when the microservice is deployed on OpenShift are in properties file: src/main/resources/application-openshift.properties
 
 Execute the maven command for each microservices (go to the specific microservice root folder):
 
@@ -157,3 +165,95 @@ On local web browser are available at:
 
     [GET] http://rhoar-sickrequests-microservice-leave-vacation.ocp-cluster_ip/health
     ```
+
+**OpenTracing and Jaeger configuration**
+
+This project uses Jaeger to trace calls to microservices. Jaegar is an OpenTracing implementation. More details are available at:
+https://github.com/jaegertracing/jaeger-openshift
+
+In order to use Jaeger on OpenShift, all-in-one templates are available.
+
+The template will install an application with the jaeger components ready to be used (jaeger-agent, jaeger-collector, jaeger-query, zipkin).
+
+After login to the leave vacation OpenShift project install the all-in-one template:
+
+```bash
+
+# development template, in memory storage for tracing, not production-ready
+
+oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc create -f -
+```
+For a production-ready installation follow the instructions at:<br>
+https://github.com/jaegertracing/jaeger-openshift (Production setup section).
+
+After installed, The Jaeger UI will be available at:<br>
+https://jaeger-query-leave-vacation.ocp-cluster_ip/search
+
+So far the employee microservice creates the tracing data for server requests (rest endpoints) and also client requests to sick request microservice (RestTemplate).
+
+The employee microservice uses the Jaeger agent to collect tracing data; this agent is deployed as a *sidecar* container in Openshift deployment file:<br>
+*src/main/fabric8/deployment.yml*
+
+```bash
+- image: jaegertracing/jaeger-agent
+  name: jaeger-agent
+  ports:
+  - containerPort: 5775
+    protocol: UDP
+  - containerPort: 5778
+  - containerPort: 6831
+    protocol: UDP
+  - containerPort: 6832
+    protocol: UDP
+  command:
+  - /go/bin/agent-linux
+  - '--collector.host-port=jaeger-collector.leave-vacation.svc:14267'
+```
+
+The Jaeger configuration properties are in file:<br>
+*src/main/reources/application-openshift.properties*
+
+```bash
+jaeger.service-name=rhoar-employee-microservice
+jaeger.sampler-type=ratelimiting
+jaeger.sampler-param=1
+jaeger.reporter-log-spans=true
+opentracing.servlet.skipPattern=/health|/favicon\.ico
+```
+The employee microservice uses jaeger and opentracing api to trace the data.<br>
+Maven dependencies are listed in *pom.xml* file:
+
+```
+<!-- OpenTracing -->
+<dependency>
+  <groupId>io.opentracing.contrib</groupId>
+  <artifactId>opentracing-spring-web</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.opentracing.contrib</groupId>
+  <artifactId>opentracing-web-servlet-filter</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.opentracing</groupId>
+  <artifactId>opentracing-api</artifactId>
+</dependency>
+<dependency>
+  <groupId>com.uber.jaeger</groupId>
+  <artifactId>jaeger-core</artifactId>
+</dependency>
+```
+
+The employee application defines a web filter and a rest template interceptor to trace data.
+
+The web filter:<br> *com.redhat.springboot.vacationleave.employee.tracing.TracingFilterConfiguration*<br>
+registers the url patterns and the skip patterns to be traced.
+
+The rest template interceptor:<br>
+*com.redhat.springboot.vacationleave.employee.tracing.TracingRestHandlerInterceptor*<br>
+injects the recorder for every external calls that will use the Rest Template (in this example the call to the sick request microservice).
+
+The Jaeger tracer configuration is created in class:<br>
+*com.redhat.springboot.vacationleave.employee.tracing.JaegerTracerConfiguration*
+
+Tracing data (for every URL endpoint) will be available in Jaeger query UI available at:<br>
+https://jaeger-query-leave-vacation.ocp-cluster_ip/search
