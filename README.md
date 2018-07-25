@@ -257,3 +257,5 @@ The Jaeger tracer configuration is created in class:<br>
 
 Tracing data (for every URL endpoint) will be available in Jaeger query UI available at:<br>
 https://jaeger-query-leave-vacation.ocp-cluster_ip/search
+
+![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/jaeger-ui.png)
