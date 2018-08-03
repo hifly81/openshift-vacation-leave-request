@@ -204,8 +204,10 @@ oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/m
 For a production-ready installation follow the instructions at:<br>
 https://github.com/jaegertracing/jaeger-openshift (Production setup section).
 
-After installed, The Jaeger UI will be available at:<br>
-https://jaeger-query-leave-vacation.ocp-cluster_ip/search
+After installed, the Jaeger UI will be available at:<br>
+```
+https://jaeger-query-leave-vacation.<ocp-cluster_ip>/search
+```
 
 So far the employee microservice creates the tracing data for server requests (rest endpoints) and also client requests to sick request microservice (RestTemplate).
 
@@ -313,9 +315,9 @@ public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest
 
 Two web filters must be enabled to activate hystrix:
 #activate hytrix
-com.redhat.springboot.vacationleave.employee.hystrix.HystrixRequestContextFilter
+*com.redhat.springboot.vacationleave.employee.hystrix.HystrixRequestContextFilter*
 #propagate the opentracing span to hystrix
-com.redhat.springboot.vacationleave.employee.tracing.SpanContextHystrixRequestVariableFilter
+*com.redhat.springboot.vacationleave.employee.tracing.SpanContextHystrixRequestVariableFilter*
 
 Streams produced by Hystrix can be aggregated by Netflix Turbine; Turbine aggregates the streams for consumption by Hystrix UI dashboard.
 
@@ -353,6 +355,6 @@ Register the turbine stream to the Hystrix dashboard using the turbine service U
 http://<turbine-service-url>/turbine-1.0.0-SNAPSHOT/turbine.stream
 ```
 
-You cn test the list sick requests by ssn endpoint and analyze the state of the circuit (Open/Closed) and the metrics using the Hystrix dashboard
+You can test the list sick requests by ssn endpoint and analyze the state of the circuit (Open/Closed) and the metrics using the Hystrix dashboard
 
 ![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/hystrix_dashboard.png)
