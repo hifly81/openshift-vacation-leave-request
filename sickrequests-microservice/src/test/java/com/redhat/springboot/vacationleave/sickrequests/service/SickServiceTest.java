@@ -8,9 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -33,6 +35,20 @@ public class SickServiceTest {
         sickRequestDto = sickService.save(sickRequestDto);
         assertNotNull(sickRequestDto);
         assertEquals(sickRequestDto.getSickRequestStatus(), SickRequestStatus.PENDING);
+    }
+
+    @Test
+    public void getRequestsByEmployee() {
+        SickRequestDto sickRequestDto = new SickRequestDto();
+        sickRequestDto.setEmployeeId("AB121231");
+        sickRequestDto.setDateRequested(LocalDate.of(2018, 10, 21));
+        sickRequestDto = sickService.save(sickRequestDto);
+        assertNotNull(sickRequestDto);
+        assertEquals(sickRequestDto.getSickRequestStatus(), SickRequestStatus.PENDING);
+
+        List<SickRequestDto> result = sickService.getRequestsByEmployee("AB121231", new PageRequest(0, 100));
+        assertNotNull(result);
+        assertEquals(result.size(), 1);
     }
 
 

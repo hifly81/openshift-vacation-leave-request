@@ -59,6 +59,7 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+
         <!-- Health Check -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -81,6 +82,12 @@
         <dependency>
             <groupId>com.uber.jaeger</groupId>
             <artifactId>jaeger-core</artifactId>
+        </dependency>
+
+        <!-- Circuit Breaker -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-hystrix</artifactId>
         </dependency>
 
         <!-- Testing -->

@@ -23,13 +23,13 @@ These endpoints are available for employee microservice (listen on port 8080):
  - list employees with leave list
 
  ```
- [GET] http://localhost:8080/api/employees?page=<page_number>&pageSize=<page_size>
+ [GET] http://<url>/api/employees?page=<page_number>&pageSize=<page_size>
  ```
 
   - send sick request from employee
 
   ```
-  [POST] http://localhost:8080/api/employees/sickRequest
+  [POST] http://<url>/api/employees/sickRequest
 
    body example:
 
@@ -38,12 +38,24 @@ These endpoints are available for employee microservice (listen on port 8080):
     }
   ```
 
+  - list sick requests by ssn
+
+  ```
+  [GET] http://<url>/api/employees/sickRequest/<ssn>?page=<page_number>&pageSize=<page_size>
+  ```
+
 These endpoints are available for sick requests microservice (listen on port 8090):
+
+   - list sick requests
+
+   ```
+   [GET] http://<url>/api/sickrequests?page=<page_number>&pageSize=<page_size>
+   ```
 
   - send sick request
 
   ```
-  [PUT] http://localhost:8090/api/sickrequests
+  [PUT] http://<url>/api/sickrequests
 
   body example:
 
@@ -52,6 +64,12 @@ These endpoints are available for sick requests microservice (listen on port 809
   	"dateRequested": "2018-10-21"
   }
 
+  ```
+
+  - list sick requets by employee ssn
+
+  ```
+  [GET] http://<url>/api/sickrequests/<ssn>?page=<page_number>&pageSize=<page_size>
   ```
 
 
@@ -115,13 +133,13 @@ Endpoints will be available via OCP routes:
 ```
 #for employee microservice
 
-http://rhoar-employee-microservice-leave-vacation.ocp-cluster_ip
+http://rhoar-employee-microservice-leave-vacation.<ocp-cluster_ip>
 ```
 
 ```
 #for sick requests microservice
 
-http://rhoar-sickrequests-microservice-leave-vacation.ocp-cluster_ip
+http://rhoar-sickrequests-microservice-leave-vacation.<ocp-cluster_ip>
 ```
 
 
@@ -143,13 +161,13 @@ On local web browser are available at:
  ```
  #for employee microservice
 
- [GET] http://localhost:8080/health
+ [GET] http://<url>/health
  ```
 
   ```
   #for sick requests microservice
 
-  [GET] http://localhost:8090/health
+  [GET] http://<url>/health
   ```
 
   On OpenShift are available at:
@@ -157,13 +175,13 @@ On local web browser are available at:
    ```
    #for employee microservice
 
-   [GET] http://rhoar-employee-microservice-leave-vacation.ocp-cluster_ip/health
+   [GET] http://rhoar-employee-microservice-leave-vacation.<ocp-cluster_ip>/health
    ```
 
     ```
     #for sick requests microservice
 
-    [GET] http://rhoar-sickrequests-microservice-leave-vacation.ocp-cluster_ip/health
+    [GET] http://rhoar-sickrequests-microservice-leave-vacation.<ocp-cluster_ip>/health
     ```
 
 **OpenTracing and Jaeger configuration**
@@ -256,6 +274,85 @@ The Jaeger tracer configuration is created in class:<br>
 *com.redhat.springboot.vacationleave.employee.tracing.JaegerTracerConfiguration*
 
 Tracing data (for every URL endpoint) will be available in Jaeger query UI available at:<br>
-https://jaeger-query-leave-vacation.ocp-cluster_ip/search
+```
+https://jaeger-query-leave-vacation.<ocp-cluster_ip>/search
+```
 
 ![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/jaeger-ui.png)
+
+
+**Hystrix Circuit Breaker configuration**
+
+This project uses *Spring Cloud Hystrix* to implement a circuit breaker in employee microservice.<br>
+*Netflix Turbine* is the module able to aggregate the streams produced by the circuit breaker.<br>
+*Hystrix dashboard* can be used to visualize the state and the metrics produced from the circuit breaker (streams).<br>
+Hystrix dashboard registers the turbine streams.
+
+The endpoint:  
+- list sick requests by ssn
+
+  ```
+  [GET] http://<url>/api/employees/sickRequest/<ssn>?page=<page_number>&pageSize=<page_size>
+  ```
+in case of failure of the sick request microservice will answer with a fallback.
+
+Maven dependency for hystrix is listed in employee *pom.xml* file:
+```
+ <dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-hystrix</artifactId>
+ </dependency>
+```
+
+The method: *com.redhat.springboot.vacationleave.employee.service.SickRequestServiceImpl.getRequestsBySSN* is annotated with *@HystrixCommand*:
+```
+@Override
+@HystrixCommand(fallbackMethod = "getRequestsBySSNFallback")
+public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest) {
+  ```
+
+Two web filters must be enabled to activate hystrix:
+#activate hytrix
+com.redhat.springboot.vacationleave.employee.hystrix.HystrixRequestContextFilter
+#propagate the opentracing span to hystrix
+com.redhat.springboot.vacationleave.employee.tracing.SpanContextHystrixRequestVariableFilter
+
+Streams produced by Hystrix can be aggregated by Netflix Turbine; Turbine aggregates the streams for consumption by Hystrix UI dashboard.
+
+Turbine uses the *fabric8 openshift client* to discover the openshift services (in this example the employee microservice) that produce a hystrix stream.<br>
+The fabrix8 openshift client discovers only the services labeled with the property *hystrix.enabled: true*<br>
+Turbine is developed on top of a Red Hat EAP image.
+
+In order to install and configure Turbine and Hystrix dashboard on OpenShift these are the required steps:
+
+```bash
+#add the cluster-reader role to project leave-vacation
+oc policy add-role-to-user cluster-reader system:serviceaccount:leave-vacation:default
+
+#import the Red Hat EAP image from Red Hat registry (required for Turbine)
+oc import-image my-jboss-eap-7/eap71-openshift --from=registry.access.redhat.com/jboss-eap-7/eap71-openshift --confirm
+
+#Create the Turbine service with s2i method
+oc new-app eap71-openshift~https://github.com/hifly81/openshift-vacation-leave-request --context-dir=turbine --name=turbine
+
+#Create the Hystrix Dashboard (use an image from docker hub)
+oc new-app mlabouardy/hystrix-dashboard:latest --name=hystrix-dashboard
+
+#Expose Turbine and Hystrix dashboard routes
+oc expose service turbine
+oc expose service hystrix-dashboard
+```
+
+Hystrix dashboard will be available at URL:<br>
+```
+http://hystrix-dashboard-leave-vacation.<ocp-cluster_ip>/hystrix
+```
+
+Register the turbine stream to the Hystrix dashboard using the turbine service URL:<br>
+```
+http://<turbine-service-url>/turbine-1.0.0-SNAPSHOT/turbine.stream
+```
+
+You cn test the list sick requests by ssn endpoint and analyze the state of the circuit (Open/Closed) and the metrics using the Hystrix dashboard
+
+![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/hystrix_dashboard.png)

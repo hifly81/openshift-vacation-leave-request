@@ -53,6 +53,14 @@ public class EmployeeController {
 
     }
 
+    @ResponseBody
+    @RequestMapping("/sickRequest/{ssn}")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SickRequestDto>> listBySSN(@PathVariable String ssn, @RequestParam("page") Integer page, @RequestParam("pageSize") Integer pageSize) {
+        List<SickRequestDto> result = sickRequestService.getRequestsBySSN(ssn, new PageRequest(page, pageSize));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     private EmployeeDto convertToDto(Employee employee) {
         EmployeeDto employeeDto = modelMapper.map(employee, EmployeeDto.class);
         return employeeDto;
