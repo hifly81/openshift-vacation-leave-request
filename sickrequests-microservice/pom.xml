@@ -24,7 +24,7 @@
     	<version>1.0</version>
     </parent>
     
-    <artifactId>rhoar-sickrequests-microservice</artifactId>
+    <artifactId>rhoar-sickrequests-microservice-v2</artifactId>
 
     <dependencies>
         <dependency>

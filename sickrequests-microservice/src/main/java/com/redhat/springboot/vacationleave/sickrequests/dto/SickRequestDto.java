@@ -1,12 +1,14 @@
 package com.redhat.springboot.vacationleave.sickrequests.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.redhat.springboot.vacationleave.sickrequests.model.SickRequestStatus;
 
 import java.time.LocalDate;
 
 public class SickRequestDto {
 
+    @JsonIgnore
     private Integer id;
 
     private String employeeId;
