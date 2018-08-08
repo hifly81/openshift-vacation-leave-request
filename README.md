@@ -358,3 +358,58 @@ http://<turbine-service-url>/turbine-1.0.0-SNAPSHOT/turbine.stream
 You can test the list sick requests by ssn endpoint and analyze the state of the circuit (Open/Closed) and the metrics using the Hystrix dashboard
 
 ![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/hystrix_dashboard.png)
+
+
+**Blue-green deployment**
+
+Blue-green is a tecnique that minimize the risk and the downtime of a microservice architecture.<br>
+It is based on having currently running two versions of the same microservice and at any time only one of the microservice serves all incoming traffic.
+
+A Blue-green can be applied to different levels: you can have an entire blue and green OpenShift cluster or, as in this example, a single microservice inside a cluster provisioned with a blue-green tecnique.
+
+Imagine that we want to release a new version of the sick requests microservice and direct (when the deployment is ready) the traffic from the previous version of the sick requests microservice (blue) to the new one (green).
+
+The new version of sick requests microservice introduces a modification; inside class
+*com.redhat.springboot.vacationleave.sickrequests.dto.SickRequestDto*<br>
+the field *private Integer id;* is annotated with *@JsonIgnore* and it will not be serialized/deserialized.
+
+A new git branch named *v2* has been created for the new version of sick requests microservice.
+
+Deploy the new microservice on Openshift:
+
+```bash
+git checkout v2
+cd sickrequests-microservice
+mvn package fabric8:deploy -Popenshift -DskipTests
+```
+
+A new app named *rhoar-sickrequests-microservice-v2* will be available on OpenShift.
+This new app doesn't provide a *route* and it's not exposed to external traffic.
+
+The existing route *rhoar-sickrequests-microservice* still points to the older version of sick requests microservice *rhoar-sickrequests-microservice*.
+
+Let's modify the route pointing to the new version:
+
+```bash
+oc patch route/rhoar-sickrequests-microservice -p '{"spec":{"to":{"name":"rhoar-sickrequests-microservice-v2"}}}'
+```
+
+Now every requests directed to:
+```
+ http://rhoar-sickrequests-microservice-leave-vacation.<ocp-cluster_ip>/
+```
+
+will be handled by the new version.
+
+But the employee microservice doesn't use the route to communicate with sick requests microservice; it uses the internal *service* address; let's modify the *rhoar-sickrequests-microservice* service to point to the new version:
+
+```bash
+oc patch svc/rhoar-sickrequests-microservice -p '{"spec":{"selector":{"app":"rhoar-sickrequests-microservice-v2"}}}'
+```
+
+Now every requests directed to
+```
+ http://rhoar-employee-microservice-leave-vacation.<ocp-cluster_ip>/api/employees/sickRequest
+```
+
+will be handled by the new version.
