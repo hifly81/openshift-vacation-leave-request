@@ -1,6 +1,7 @@
 package com.redhat.springboot.vacationleave.employee.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.redhat.springboot.vacationleave.employee.dto.EmployeeDto;
 import com.redhat.springboot.vacationleave.employee.dto.SickRequestDto;
 import com.redhat.springboot.vacationleave.employee.tracing.SpanContextHystrixRequestVariable;
@@ -45,7 +46,12 @@ public class SickRequestServiceImpl implements SickRequestService {
     }
 
     @Override
-    @HystrixCommand(fallbackMethod = "getRequestsBySSNFallback")
+    @HystrixCommand(
+            fallbackMethod = "getRequestsBySSNFallback",
+            threadPoolProperties = {
+                @HystrixProperty(name = "coreSize", value = "10"),
+                @HystrixProperty(name = "maxQueueSize", value = "5")
+                })
     public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest) {
 
         SpanContext spanContext = SpanContextHystrixRequestVariable.getInstance().get();
