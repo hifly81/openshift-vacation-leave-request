@@ -49,9 +49,9 @@ public class SickRequestServiceImpl implements SickRequestService {
     @HystrixCommand(
             fallbackMethod = "getRequestsBySSNFallback",
             threadPoolProperties = {
-                @HystrixProperty(name = "coreSize", value = "10"),
-                @HystrixProperty(name = "maxQueueSize", value = "5")
-                })
+                    @HystrixProperty(name = "coreSize", value = "10"),
+                    @HystrixProperty(name = "maxQueueSize", value = "5")
+            })
     public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest) {
 
         SpanContext spanContext = SpanContextHystrixRequestVariable.getInstance().get();
