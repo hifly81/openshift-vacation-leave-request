@@ -309,9 +309,19 @@ Maven dependency for hystrix is listed in employee *pom.xml* file:
 The method: *com.redhat.springboot.vacationleave.employee.service.SickRequestServiceImpl.getRequestsBySSN* is annotated with *@HystrixCommand*:
 ```
 @Override
-@HystrixCommand(fallbackMethod = "getRequestsBySSNFallback")
-public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest) {
+@HystrixCommand(
+            fallbackMethod = "getRequestsBySSNFallback",
+            threadPoolProperties = {
+                    @HystrixProperty(name = "coreSize", value = "10"),
+                    @HystrixProperty(name = "maxQueueSize", value = "5")
+            })
+    public List<SickRequestDto> getRequestsBySSN(String ssn, PageRequest pageRequest) {
   ```
+
+Hystrix employs the *bulkhead* pattern to isolate dependencies from each other and to limit concurrent access to any one of them.
+The isolation is achieved using dedicated thread pools; in this example the thread pool for this communication relies on the properties:
+ - coreSize: core thread-pool size
+ - maxQueueSize: maximum queue size of the BlockingQueue implementation
 
 Two web filters must be enabled to activate hystrix:
 #activate hytrix
