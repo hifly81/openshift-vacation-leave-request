@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.redhat.springboot.vacationleave.employee.model.LeaveType;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class LeaveDto {
+public class LeaveDto implements Serializable {
 
     private Integer id;
 

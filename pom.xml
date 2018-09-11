@@ -30,6 +30,8 @@
         <opentracing-version>0.0.9</opentracing-version>
         <opentracing-api-version>0.30.0</opentracing-api-version>
         <jaeger-version>0.20.0</jaeger-version>
+        <!--infinispan hotroad -->
+        <infinispan-version>8.5.0.Final-redhat-9</infinispan-version>
     </properties>
 
 
@@ -86,6 +88,11 @@
                 <groupId>com.uber.jaeger</groupId>
                 <artifactId>jaeger-core</artifactId>
                 <version>${jaeger-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-client-hotrod</artifactId>
+                <version>${infinispan-version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>

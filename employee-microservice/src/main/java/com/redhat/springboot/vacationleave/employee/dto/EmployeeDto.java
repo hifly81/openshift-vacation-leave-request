@@ -2,11 +2,12 @@ package com.redhat.springboot.vacationleave.employee.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class EmployeeDto {
+public class EmployeeDto implements Serializable {
 
     private Integer id;
 
@@ -15,6 +16,8 @@ public class EmployeeDto {
     private String surname;
 
     private String ssn;
+
+    private EmployeeExtraInfo extraInfo;
 
     private List<LeaveDto> leaves = new ArrayList<>();
 
@@ -49,6 +52,14 @@ public class EmployeeDto {
 
     public void setSsn(String ssn) {
         this.ssn = ssn;
+    }
+
+    public EmployeeExtraInfo getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(EmployeeExtraInfo extraInfo) {
+        this.extraInfo = extraInfo;
     }
 
     public List<LeaveDto> getLeaves() {

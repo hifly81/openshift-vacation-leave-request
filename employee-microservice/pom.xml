@@ -59,6 +59,13 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <!-- Infinispan/JDG -->
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-client-hotrod</artifactId>
+            <version>${infinispan-version}</version>
+        </dependency>
+
 
         <!-- Health Check -->
         <dependency>
