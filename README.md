@@ -20,11 +20,17 @@ mvn spring-boot:run
 ```
 
 These endpoints are available for employee microservice (listen on port 8080):
- - list employees with leave list
+  - list employees with leave list
 
- ```
- [GET] http://<url>/api/employees?page=<page_number>&pageSize=<page_size>
- ```
+  ```
+  [GET] http://<url>/api/employees?page=<page_number>&pageSize=<page_size>
+  ```
+
+  - employee details (cached in JDG)
+
+  ```
+  [GET] http://<url>/api/employees/details/<ssn>
+  ```
 
   - send sick request from employee
 
