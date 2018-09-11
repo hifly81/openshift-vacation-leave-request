@@ -61,6 +61,13 @@ public class EmployeeController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @ResponseBody
+    @RequestMapping("/details/{ssn}")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeDto> details(@PathVariable String ssn) {
+        return new ResponseEntity<>(employeeService.details(ssn), HttpStatus.OK);
+    }
+
     private EmployeeDto convertToDto(Employee employee) {
         EmployeeDto employeeDto = modelMapper.map(employee, EmployeeDto.class);
         return employeeDto;

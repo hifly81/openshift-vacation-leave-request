@@ -368,7 +368,42 @@ http://<turbine-service-url>/turbine-1.0.0-SNAPSHOT/turbine.stream
 You can test the list sick requests by ssn endpoint and analyze the state of the circuit (Open/Closed) and the metrics using the Hystrix dashboard
 
 ![alt text](https://github.com/hifly81/openshift-vacation-leave-request/blob/master/resources/images/hystrix_dashboard.png)
+This project uses *Spring Cloud Hystrix* to implement a circuit breaker in employee microservice.<br>
+*Netflix Turbine* is the module able to aggregate the streams produced by the circuit breaker.<br>
 
+**Caching on OpenShift**
+
+The employee microservice uses an external cache to load the full details of employees registered into the system. (basic info + extra info)
+ - It firstly verify if the details are held in the cache
+ - If the item is not in cache, it will read the item from an external system (not implemented)
+ - The item fetched from the external system will be stored in the external cache
+
+This simple algorithm is called *cache-aside* strategy.
+
+The distributed cache is an instance of Red Hat JBoss Data Grid.
+
+A new application based on a JDG image will be created using the official imagestream from the Red Hat container catalog; a cache named "employee" will be instantiated.<br>
+The JDG application  will be created in the leave-vacation project and it will  use an openshift template:<br>
+*openshift-vacation-leave-request/resources/ocp/datagrid72-basic.json*
+
+```bash
+oc project leave-vacation
+
+#Import the latest JDG imagestream from Red Hat container catalag
+
+oc import-image my-jboss-datagrid-7/datagrid72-openshift --from=registry.access.redhat.com/jboss-datagrid-7/datagrid72-openshift -n openshift 	--confirm
+
+#Create the imagestream
+
+oc create -f openshift-vacation-leave-request/resources/ocp/jboss-datagrid72-openshift-rhel7.json -n openshift
+
+#Import the JDG template
+
+oc create -f openshift-vacation-leave-request/resources/ocp/datagrid72-basic.json -n openshift
+
+#Create the JDG application with the "employee" cache
+oc new-app datagrid72-basic --name jdg -p CACHE_NAMES=employee
+```
 
 **Blue-green deployment**
 
